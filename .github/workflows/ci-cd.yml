@@ -26,11 +26,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Test data collection script
+      - name: Run data collection script
         run: |
           python collect-github_data.py
+        continue-on-error: false
 
-      - name: Test model evaluation script
+      - name: Verify CSV file creation
+        run: |
+          if [ ! -f github_repositories_detailed.csv ]; then
+            echo "Error: github_repositories_detailed.csv not found."
+            exit 1
+          fi
+
+      - name: Run model evaluation script
         run: |
           python evaluate.py
 
