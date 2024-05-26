@@ -8,9 +8,15 @@ import os
 load_dotenv()
 
 github_token = os.getenv('TOKEN')
+
+# Check if the token is available
+if not github_token:
+    raise ValueError("GitHub token not found. Make sure TOKEN is set.")
+
+# Headers for authentication
+headers = {'Authorization': f'token {github_token}'}
 GITHUB_API_URL = 'https://api.github.com/search/repositories'
 REPO_API_URL = 'https://api.github.com/repos'
-HEADERS = {'Authorization': f'token {GITHUB_TOKEN}'}
 
 # Function to get repositories data
 def get_repositories(query, max_repos=1000):
