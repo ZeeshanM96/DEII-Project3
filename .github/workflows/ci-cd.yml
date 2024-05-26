@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,15 +31,16 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
         run: |
           python collect-github_data.py
+        continue-on-error: false
 
       - name: Verify CSV file creation and content
         run: |
           if [ ! -f github_repositories_detailed.csv ]; then
-            echo "ERROR: github_repositories_detailed.csv not found."
+            echo "Error: github_repositories_detailed.csv not found."
             exit 1
           fi
           if [ ! -s github_repositories_detailed.csv ]; then
-            echo "ERROR: github_repositories_detailed.csv is empty."
+            echo "Error: github_repositories_detailed.csv is empty."
             exit 1
           fi
 
@@ -47,53 +48,19 @@ jobs:
         run: |
           python evaluate.py
 
-      - name: Save best model artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: best-model
-          path: best_model.pkl
-
       - name: Build Docker image
         run: |
           docker build -t my-github-project .
 
-      - name: Push Docker image to DockerHub
+      - name: Login to DockerHub
         env:
           DOCKER_CREDS: ${{ secrets.DE_PROJECT }}
         run: |
           echo "${{ fromJson(env.DOCKER_CREDS).DOCKER_PASSWORD }}" | docker login -u "${{ fromJson(env.DOCKER_CREDS).DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker image
+        env:
+          DOCKER_CREDS: ${{ secrets.DE_PROJECT }}
+        run: |
           docker tag my-github-project:latest "${{ fromJson(env.DOCKER_CREDS).DOCKER_USERNAME }}/my-github-project:latest"
           docker push "${{ fromJson(env.DOCKER_CREDS).DOCKER_USERNAME }}/my-github-project:latest"
-
-  deploy-to-production:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Download best model artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: best-model
-          path: ./model
-
-      - name: Deploy to Development Server
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.DEV_SERVER_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            ansible-playbook -i inventory deploy.yml --limit development
-
-      - name: Deploy to Production Server
-        needs: deploy-to-development
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.PROD_SERVER_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            ansible-playbook -i inventory deploy.yml --limit production
