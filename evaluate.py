@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -118,12 +119,17 @@ print(f"Gradient Boosting Regressor Cross-Validation R-squared: {cross_val_gbr.m
 
 # Identify the best model
 if r2_lr > r2_ridge and r2_lr > r2_rf and r2_lr > r2_gbr:
-    best_model = 'Linear Regression'
+    best_model = ('Linear Regression', lr_model)
 elif r2_ridge > r2_lr and r2_ridge > r2_rf and r2_ridge > r2_gbr:
-    best_model = 'Ridge Regression'
+    best_model = ('Ridge Regression', ridge_model)
 elif r2_rf > r2_lr and r2_rf > r2_ridge and r2_rf > r2_gbr:
-    best_model = 'Random Forest Regressor'
+    best_model = ('Random Forest Regressor', best_rf_model)
 else:
-    best_model = 'Gradient Boosting Regressor'
+    best_model = ('Gradient Boosting Regressor', best_gbr_model)
 
-print(f"Best model: {best_model}")
+best_model_name, best_model_instance = best_model
+print(f"Best model: {best_model_name}")
+
+# Save the best model
+joblib.dump(best_model_instance, 'best_model.pkl')
+print(f"Best model saved as best_model.pkl")
