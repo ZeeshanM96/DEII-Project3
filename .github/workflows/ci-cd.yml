@@ -31,10 +31,14 @@ jobs:
           python collect-github_data.py
         continue-on-error: false
 
-      - name: Verify CSV file creation
+      - name: Verify CSV file creation and content
         run: |
           if [ ! -f github_repositories_detailed.csv ]; then
             echo "Error: github_repositories_detailed.csv not found."
+            exit 1
+          fi
+          if [ ! -s github_repositories_detailed.csv ]; then
+            echo "Error: github_repositories_detailed.csv is empty."
             exit 1
           fi
 
