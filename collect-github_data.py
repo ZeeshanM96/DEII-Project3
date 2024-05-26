@@ -7,7 +7,7 @@ import os
 
 load_dotenv()
 
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+github_token = os.getenv('TOKEN')
 GITHUB_API_URL = 'https://api.github.com/search/repositories'
 REPO_API_URL = 'https://api.github.com/repos'
 HEADERS = {'Authorization': f'token {GITHUB_TOKEN}'}
