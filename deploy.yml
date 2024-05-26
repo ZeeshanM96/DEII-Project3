@@ -1,0 +1,54 @@
+---
+- name: Ensure Docker is installed
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+      tags: docker
+
+    - name: Ensure Docker is started
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+- name: Deploy GitHub Project Container to Development
+  hosts: development
+  become: true
+  tasks:
+    - name: Pull latest Docker image
+      community.docker.docker_image:
+        name: zeeshanm96/DEII-Project3
+        tag: latest
+        source: pull
+
+    - name: Run container
+      community.docker.docker_container:
+        name: github_project_dev
+        image: zeeshanm96/DEII-Project3:latest
+        state: started
+        ports:
+          - "8000:8000"
+        restart_policy: always
+
+- name: Deploy GitHub Project Container to Production
+  hosts: production
+  become: true
+  tasks:
+    - name: Pull latest Docker image
+      community.docker.docker_image:
+        name: zeeshanm96/DEII-Project3
+        tag: latest
+        source: pull
+
+    - name: Run container
+      community.docker.docker_container:
+        name: github_project_prod
+        image: zeeshanm96/DEII-Project3
+        state: started
+        ports:
+          - "8000:8000"  # Adjust port mapping as needed
+        restart_policy: always
