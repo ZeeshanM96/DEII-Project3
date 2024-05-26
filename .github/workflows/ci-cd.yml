@@ -27,6 +27,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run data collection script
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
         run: |
           python collect-github_data.py
         continue-on-error: false
