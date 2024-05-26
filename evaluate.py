@@ -8,6 +8,7 @@ from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+import joblib
 
 # Load the data
 df = pd.read_csv('github_repositories_detailed.csv')
