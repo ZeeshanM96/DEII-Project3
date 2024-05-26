@@ -14,7 +14,7 @@ if not github_token:
     raise ValueError("GitHub token not found. Make sure TOKEN is set.")
 
 # Headers for authentication
-headers = {'Authorization': f'token {github_token}'}
+HEADERS = {'Authorization': f'token {github_token}'}
 GITHUB_API_URL = 'https://api.github.com/search/repositories'
 REPO_API_URL = 'https://api.github.com/repos'
 
