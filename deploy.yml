@@ -1,5 +1,5 @@
 ---
-- name: Ensure Docker is installed
+- name: Ensure Docker is installed and running
   hosts: all
   become: true
   tasks:
@@ -15,39 +15,51 @@
         state: started
         enabled: true
 
+    - name: Debug info
+      debug:
+        msg: "Docker installed and started on {{ inventory_hostname }}"
+
 - name: Deploy GitHub Project Container to Development
   hosts: development
   become: true
   tasks:
+    - name: Debug info
+      debug:
+        msg: "Deploying Docker container on development server {{ inventory_hostname }}"
+
     - name: Pull latest Docker image
       community.docker.docker_image:
-        name: zeeshanm96/DEII-Project3
+        name: zeeshanm96/github-project
         tag: latest
         source: pull
 
     - name: Run container
       community.docker.docker_container:
         name: github_project_dev
-        image: zeeshanm96/DEII-Project3:latest
+        image: zeeshanm96/github-project:latest
         state: started
         ports:
-          - "8000:8000"
+          - "8000:8000"  # Adjust port mapping as needed
         restart_policy: always
 
 - name: Deploy GitHub Project Container to Production
   hosts: production
   become: true
   tasks:
+    - name: Debug info
+      debug:
+        msg: "Deploying Docker container on production server {{ inventory_hostname }}"
+
     - name: Pull latest Docker image
       community.docker.docker_image:
-        name: zeeshanm96/DEII-Project3
+        name: zeeshanm96/github-project
         tag: latest
         source: pull
 
     - name: Run container
       community.docker.docker_container:
         name: github_project_prod
-        image: zeeshanm96/DEII-Project3
+        image: zeeshanm96/github-project:latest
         state: started
         ports:
           - "8000:8000"  # Adjust port mapping as needed
