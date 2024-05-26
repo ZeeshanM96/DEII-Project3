@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Test data collection script
+        run: |
+          python collect-github_data.py
+
+      - name: Test model evaluation script
+        run: |
+          python evaluate.py
+
+      - name: Build Docker image
+        run: |
+          docker build -t my-github-project .
+
+      - name: Login to DockerHub
+        env:
+          DOCKER_CREDS: ${{ secrets.DE_PROJECT }}
+        run: |
+          echo "${{ fromJson(env.DOCKER_CREDS).DOCKER_PASSWORD }}" | docker login -u "${{ fromJson(env.DOCKER_CREDS).DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Docker image
+        env:
+          DOCKER_CREDS: ${{ secrets.DE_PROJECT }}
+        run: |
+          docker tag my-github-project:latest "${{ fromJson(env.DOCKER_CREDS).DOCKER_USERNAME }}/my-github-project:latest"
+          docker push "${{ fromJson(env.DOCKER_CREDS).DOCKER_USERNAME }}/my-github-project:latest"
