@@ -39,7 +39,7 @@
         image: zeeshanm96/github-project:latest
         state: started
         ports:
-          - "8000:8000"  # Adjust port mapping as needed
+          - "8000:8000" 
         restart_policy: always
 
 - name: Deploy GitHub Project Container to Production
@@ -62,5 +62,5 @@
         image: zeeshanm96/github-project:latest
         state: started
         ports:
-          - "8000:8000"  # Adjust port mapping as needed
+          - "8000:8000" 
         restart_policy: always
