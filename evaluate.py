@@ -134,3 +134,6 @@ print(f"Best model: {best_model_name}")
 # Save the best model
 joblib.dump(best_model_instance, 'best_model.pkl')
 print(f"Best model is saved as best_model.pkl")
+joblib.dump(poly, 'polynomial_features.pkl')
+joblib.dump(scaler, 'standard_scaler.pkl')
+print("Polynomial features and StandardScaler are saved.")
